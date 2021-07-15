@@ -44,7 +44,11 @@ This is a prototype for an Android app that can be used to listen to articles on
 !define DARKBLUE
 !includeurl https://raw.githubusercontent.com/skallinen/RedDress-PlantUML/master/style.puml
 
-(*) --> "
+(*) --> "login" as login
+
+login -right-> "register" as register
+
+login -down->  "
 {{
 salt
 {+
@@ -57,6 +61,7 @@ article 4
 }
 }}
 " as play
+register --> play
 play -right-> "
 {{
 salt
