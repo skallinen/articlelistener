@@ -1,0 +1,270 @@
+* Article listener
+This is a prototype for an Android app that can be used to listen to articles on the web in the same way that podcasts can be listened to. To convert text to voice, we use the Google text-to-speech API, and Apache Tiki to extract text and data from the articles.
+
+** Feature list and evaluation proposal
+   
+| Feature                                                                                                                                                            | Points                   |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------|
+| Utilizes object-oriented programming                                                                                                                               | Mandatory                |
+| At least 5 classes (GUI classes are not counted)                                                                                                                   | Mandatory                |
+| Application saves user inputs to log (JSON, XML etc.)                                                                                                              | Mandatory                |
+| User can add single ad hoc articles Articles to the play que                                                                                                       | Mandatory                |
+| Html articles are parsed into plain text and metadata using apache tika                                                                                            | Mandatory                |
+| At least one API must be used, the Google speech-to-text api is used to convert text to audio.                                                                     | Mandatory                |
+| A article audio player is implemented within the app                                                                                                               | 1 – 5 points             |
+| One has a way to view the history (plain text, with graphs etc.), so user has an option to check her listening / content consumption habits over time.             | 1 – 5 points             |
+| Application is build from well designed UI-components                                                                                                              | 1 – 5 points             |
+| Application has a login function                                                                                                                                   | 3 points                 |
+| Application can has several users (and one can create more), data is saved somewhere                                                                               | 3 points                 |
+| Strong (at least one number, one special character, bot upper- and lowercase letters and is at least 12 chars long) login password is required                     | 2 points                 |
+| Password is hashed and salted                                                                                                                                      | 2 points                 |
+| Another open data source is used to create content subscription features, scientific article summaries from Axiv.org or twitter for trending articles              | 2 – 5 points             |
+| RSS feeds can be used to source article subscriptions                                                                                                              | 3 points                 |
+| User can input basic content interest of herself and these values are used in the application                                                                      | 2 points                 |
+| Application collects data from user’s weight change (she inputs the data) ja shows graphical presentation of change over time                                      | 3 points                 |
+| Application combines data from at least two data sources and produces new information                                                                              | 3 points                 |
+| Application remembers where user was before closing the app                                                                                                        | 2 points                 |
+| Usage of asynchronous HTTP-calls when getting data                                                                                                                 | 2 points                 |
+| Use of fragments instead of activities when building GUI                                                                                                           | 2 points                 |
+| Utilization of scoped storage when saving data (app does not require user permission to access mass media, but works in its own sandbox)                           | 2 points                 |
+| Responsive UI (It works well with different screen sizes)                                                                                                          | 2 points                 |
+| Documentations is not comprehensive                                                                                                                                | -1 – -5 points           |
+| Application has problems that disturb its use                                                                                                                      | -1 – -5 points           |
+| Program code is not written/commented in English, but some other language (UI texts can be in Finnish)                                                             | -3 points                |
+| Application does not follow object-orientation                                                                                                                     | -1 – -10 points          |
+| Application and/or documentation has racism, hate-speech or something other impropriate                                                                            | -20 points               |
+| Some own fancy feature or several of those                                                                                                                         | Max 5 points per feature |
+| Together (if features generate more than 40 points, the extra points can help to compensate weaker features, but no more than 40 points can be collected in total) | Max 40 points.           |
+
+
+** Preliminary Wireframe
+   The following diagram shows the main views in the application
+
+#+begin_src plantuml :file views.png :exports results
+!define DARKBLUE
+!includeurl https://raw.githubusercontent.com/skallinen/RedDress-PlantUML/master/style.puml
+
+(*) --> "
+{{
+salt
+{+
+{* <&media-play> <b>Play que | <&folder> Article Feed | <&plus> Add to que }
+ <&media-play>  <&media-pause> <&media-step-forward> playing article 1
+Nextup:
+article 2
+article 3
+article 4
+}
+}}
+" as play
+play -right-> "
+{{
+salt
+{+
+{* <&media-play> Play que | <&folder> <b>Article Feed | <&plus> Add to que }
+<b>Feed
+Article A <&plus>
+Article B <&plus>
+Article C <&plus>
+Article D <&plus>
+Article E <&plus>
+Article F <&plus>
+Article G <&plus>   | [add new feed]
+}
+}}
+" as feed
+feed -down-> "
+{{
+salt
+{+
+[Play next?]
+[Play last?]
+}
+}}
+" as playconfirm
+  playconfirm --> play
+
+play -right-> "
+{{
+salt
+{+
+{* <&media-play> Play que | <&folder> Article Feed | <&plus> <b>Add to que }
+Add article to que:
+"Paste article url "
+
+}
+}}
+" as addtoque
+addtoque --> playconfirm
+
+feed -down-> "
+{{
+salt
+{+
+Add article text to que:
+"Paste feed url "
+
+}
+}}
+" as rss
+
+rss --> feed
+  
+	
+
+      
+#+end_src
+
+#+RESULTS:
+[[file:views.png]]
+
+
+** Preliminary class diagram
+#+begin_src plantuml :file uml.png :exports results
+!define DARKBLUE
+!includeurl https://raw.githubusercontent.com/skallinen/RedDress-PlantUML/master/style.puml
+Class User {
+      -firstName: String
+      -lastName: String
+      -email: String
+      -password: Password
+      +addFirstName()
+      +addLastName()
+      +addEmail()
+      +getFirstName()
+      +getLastName()
+      +getEmail()
+      }
+      
+Class Password {
+      -password: String
+      +add()
+      +verify()
+      -hashAndSalt()
+
+      }
+      
+Class Configuration {
+      -user: User
+      -history: History
+      +getUser()
+      +getHistory()
+      +save()
+      +load()
+      }
+
+Class MediaArtifact {
+      -title: Title
+      -url: String
+      -publisher: String
+      -description: String
+      -creators: Creators
+      -publishedTime: LocalDateTime
+      -modifiedTime: LocalDateTime
+      -tags: ArrayList
+      -images: ArrayList
+      +getDescription()
+      +getPublishedTime()
+      +getModifiedTime()
+      +getPublisher()
+      +getImage()
+      }
+
+Class Title {
+      -title: String
+      -titleType: Enum
+      +getTitle()
+      +getCreatorType()
+}
+
+Class Creators {
+      -Creators: ArrayList
+      -type: Enum
+      +getCreators()
+      +getType()
+      }
+      
+Class Text {
+      -url: String
+      -text: String
+      +getText()
+      -parseText()
+}
+
+Class Audio {
+      -article: Audio
+      -compressionFormat: Compression
+      +get()
+      -save()
+      -load()
+      -rendr()
+      }
+      
+Class History {
+      -listenEvents: ArrayList
+      +list()
+      +save()
+      +load()
+}
+
+Class ListenEvent  {
+      -article: Article
+      -listenStart: LocalDateTime
+      -duration: Duration
+      -lastPosition: Timeline
+      +getEvent()
+      }
+      
+Class Image {
+      -height: Integer
+      -width: Integer
+      -outputHeight: Integer
+      -outputWidth: Integer
+      +get()
+      +getScale()
+      +getDimensions()
+      }
+
+Class Player {
+      -currentlyPlaying: Audio
+      -currentPosition: Timeline
+      +play()
+      +pause()
+      +stop()
+      +next()
+      +prev()
+      }
+
+Class PlayQue {
+      -nextUps: ArrayList<Audio>
+      +addNext()
+      +addLast()
+      +list()
+      }
+
+Class Feeds {
+      -subscriptions: ArrayList
+      -media: ArrayList
+      +add()
+      +list()
+      +refresh()          
+      }
+
+      MediaArtifact *-- Creators
+      MediaArtifact *-- Image
+      MediaArtifact *-- Text
+      MediaArtifact *-- Title
+      MediaArtifact <|-- Audio
+      PlayQue *-- Player
+      History --* ListenEvent
+      Configuration *-- User
+      Configuration *-- History
+      User *-- Password
+      ListenEvent *-- Player
+      PlayQue o-- Audio
+      Feeds o-- MediaArtifact
+      
+#+end_src
+
+#+RESULTS:
+[[file:uml.png]]
