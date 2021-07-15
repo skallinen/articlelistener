@@ -159,15 +159,15 @@ Class Configuration {
       }
 
 Class MediaArtifact {
-      -title: Title
-      -url: String
-      -publisher: String
-      -description: String
-      -creators: Creators
-      -publishedTime: LocalDateTime
-      -modifiedTime: LocalDateTime
-      -tags: ArrayList
-      -images: ArrayList
+      #title: Title
+      #url: String
+      #publisher: String
+      #description: String
+      #creators: Creators
+      #publishedTime: LocalDateTime
+      #modifiedTime: LocalDateTime
+      #tags: ArrayList
+      #images: ArrayList
       +getDescription()
       +getPublishedTime()
       +getModifiedTime()
